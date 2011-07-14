@@ -19,9 +19,9 @@
 // https://github.com/defunkt/jquery-pjax
 
 (function($){
-
-   $.siteurl = 'http://yoursite.com'; // your site url
-   $.container = '#pjaxcontainer'; // container SELECTOR to use for hash navigation
+   if (!$.hash) $.hash = '#!/';
+   if (!$.siteurl) $.siteurl = 'http://yoursite.com'; // your site url
+   if (!$.container) $.container = '#pjaxcontainer'; // container SELECTOR to use for hash navigation
 
 /* When called on a link, fetches the href with ajax into the
    container specified as the first parameter or with the data-pjax
@@ -63,6 +63,40 @@ $.fn.pjax = function( container, options ) {
 
     var defaults = {
       url: this.href,
+      container: $(this).attr('data-pjax'),
+      clickedElement: $(this),
+      isform: false
+    }
+
+    $.pjax($.extend({}, defaults, options));
+
+    event.preventDefault();
+  })
+}
+
+// Same as pjax but for forms, also will shows query in address
+
+$.fn.pjaxform = function( container, options ) {
+  if ( options )
+    options.container = container;
+  else
+    options = $.isPlainObject(container) ? container : {container:container};
+
+  // We can't persist $objects using the history API so we must use
+  // a String selector. Bail if we got anything else.
+  if ( typeof options.container !== 'string' ) {
+    throw "pjax container must be a string selector!";
+    return false;
+  }
+
+  return this.live('submit', function(event){
+    data = $(this).serialize();
+    options.type = $(this).attr('method');
+    var defaults = {
+      url: (options.type && options.type.toUpperCase()=='GET')?this.action+'?'+data:this.action,
+      push: (options.type && options.type.toUpperCase()=='GET')?true:false,
+      data: data,
+      isform: true,
       container: $(this).attr('data-pjax'),
       clickedElement: $(this)
     }
@@ -122,9 +156,10 @@ $.pjax = function( options ) {
     },
     error: function(data){
       this.success(data.responseText);
+      $container.trigger('error.pjax');
     },
-    complete: function(){
-      $container.trigger('end.pjax')
+    complete: function(jqXHR){
+      $container.trigger('complete.pjax', jqXHR);
     },
     success: function(data){
       // If we got no data or an entire web page, go directly
@@ -183,11 +218,16 @@ $.pjax = function( options ) {
 
       }
       else {
-         window.location.hash = "!"+options.url.replace(options.siteurl,"");
+        // change address if it is not form or GET form
+         if (!options.isform || options.type.toUpperCase()=='GET') {
+            window.location.hash = "!"+options.url.replace(options.siteurl,"");
+            $.hash = window.location.hash;
+         }
       }
 
       // Invoke their success handler if they gave us one.
       success.apply(this, arguments);
+      $container.trigger('success.pjax');
     }
   }
 
@@ -220,11 +260,13 @@ if( hash.length > 0 )
 {
    if( $.support.pjax )
       location = $.siteurl+hash.substr(2);
+
 }
-else if( location.pathname.length > 1 )
+else if( location.pathname.length > 1 || location.search.length > 1 )
 {
     if( !$.support.pjax )
-      window.location = $.siteurl+'/#!'+window.location.pathname;
+      window.location = $.siteurl+'/#!'+window.location.pathname+window.location.search;
+
 }
 
 // If there is no pjax support, we should handle hash changes
@@ -232,8 +274,8 @@ if( !$.support.pjax )
 {
    $(window).hashchange(function(){
       hash = window.location.hash;
-      if ( hash.substr(0,2) == '#!') {
 
+      if ( (hash.substr(0,2) == '#!' || hash=='') && hash != $.hash) {
          $.ajax({
                type: "POST",
                url: $.siteurl+hash.replace('#!',''),
@@ -242,11 +284,14 @@ if( !$.support.pjax )
                   return xhr.setRequestHeader('X-PJAX','true');
                },
                success: function(msg){
-                  $($.container).trigger('end.pjax');
                   $($.container).html(msg);
+                  $($.container).trigger('success.pjax');
+               },
+               complete: function(jqXHR){
+                  $($.container).trigger('complete.pjax', jqXHR);
                },
                error: function(a,b,c) {
-                  $($.container).trigger('end.pjax');
+                  $($.container).trigger('error.pjax');
                }
             });
 

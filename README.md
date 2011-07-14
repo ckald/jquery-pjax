@@ -1,4 +1,4 @@
-## pushState + ajax / hash navigation + ajax = pjax with normal fallback!
+## pushState + ajax / hash navigation + ajax / hash navigation + ajax + form ajax + get forms parameters in address = pjax with normal fallback!
 
             .--.
            /    \
@@ -121,6 +121,9 @@ following additions:
                      into the `container`. Useful if the server always returns
                      full HTML pages.
 
+## $(form).pjaxform( container, options )
+
+Same as `$(link).pjax()` but for forms. For GET forms will change address string
 
 ## $.pjax( options )
 
@@ -199,11 +202,13 @@ Your HTML should also include a `<title>` tag if you want page titles to work.
 
 ## events
 
-pjax will fire two events on the container you've asked it to load your
+pjax will fire four events on the container you've asked it to load your
 reponse body into:
 
 * `start.pjax` - Fired when a pjax ajax request begins.
-* `end.pjax`   - Fired when a pjax ajax request ends.
+* `success.pjax`   - Fired on pjax ajax request success.
+* `complete.pjax`   - Fired on pjax ajax request complete, one parameter is jqXHR.
+* `error.pjax`   - Fired on pjax ajax request fail.
 
 This allows you to, say, display a loading indicator upon pjaxing:
 
@@ -211,7 +216,9 @@ This allows you to, say, display a loading indicator upon pjaxing:
 $('a.pjax').pjax('#main')
 $('#main')
   .bind('start.pjax', function() { $('#loading').show() })
-  .bind('end.pjax',   function() { $('#loading').hide() })
+  .bind('success.pjax',   function() { $('#loading').hide() })
+  .live('complete.pjax',   function(event, jqXHR) {  })
+  .bind('error.pjax',   function() { })
 ```
 
 Because these events bubble, you can also set them on the body:
