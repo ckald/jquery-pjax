@@ -195,7 +195,7 @@ One more Rails example by slayerhabr (http://slayerhabr.habrahabr.ru/)
 
 ```ruby
 class ApplicationController < ActionController::Base
-layout Proc.new { |controller| request.headers['X-PJAX'] ? false : 'application' }
+   layout Proc.new { |controller| request.headers['X-PJAX'] ? false : 'application' }
 end
 ```
 
