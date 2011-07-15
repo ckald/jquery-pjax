@@ -191,6 +191,14 @@ def my_page
 end
 ```
 
+One more Rails example by slayerhabr (http://slayerhabr.habrahabr.ru/)
+
+```ruby
+class ApplicationController < ActionController::Base
+layout Proc.new { |controller| request.headers['X-PJAX'] ? false : 'application' }
+end
+```
+
 Django: <https://github.com/jacobian/django-pjax>
 
 Asp.Net MVC3: <http://biasecurities.com/blog/2011/using-pjax-with-asp-net-mvc3/>
