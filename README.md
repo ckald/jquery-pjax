@@ -1,4 +1,5 @@
-## pushState + ajax / hash navigation + ajax / hash navigation + ajax + form ajax + get forms parameters in address = pjax with normal fallback!
+## pjax with normal fallback!
+# pushState, hash-navigation, ajax forms, interchangeable url formats and other remarkable features
 
             .--.
            /    \
