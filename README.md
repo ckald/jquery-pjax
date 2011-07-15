@@ -1,5 +1,5 @@
-## pjax with normal fallback!
-# pushState, hash-navigation, ajax forms, interchangeable url formats and other remarkable features
+# pjax with normal fallback!
+## pushState, hash-navigation, ajax forms, interchangeable url formats and other remarkable features
 
             .--.
            /    \
