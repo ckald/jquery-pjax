@@ -228,8 +228,8 @@ $.pjax = function( options ) {
 
       // Invoke their success handler if they gave us one.
       success.apply(this, arguments);
-      $container.trigger('success.pjax');
-      $container.trigger('end.pjax');
+      $container.trigger('success.pjax', this.clickedElement);
+      $container.trigger('end.pjax', this.clickedElement);
     }
   }
 
