@@ -151,16 +151,16 @@ $.pjax = function( options ) {
     dataType: 'html',
     siteurl : $.siteurl,
     beforeSend: function(xhr){
-      $container.trigger('start.pjax')
+      $container.trigger('start.pjax',this.clickedElement)
       xhr.setRequestHeader('X-PJAX', 'true')
     },
     error: function(data){
       this.success(data.responseText);
-      $container.trigger('error.pjax');
-      $container.trigger('end.pjax');
+      $container.trigger('error.pjax',this.clickedElement);
+      $container.trigger('end.pjax',this.clickedElement);
     },
     complete: function(jqXHR){
-      $container.trigger('complete.pjax', jqXHR);
+      $container.trigger('complete.pjax', jqXHR, this.clickedElement);
     },
     success: function(data){
       // If we got no data or an entire web page, go directly
