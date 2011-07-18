@@ -157,6 +157,7 @@ $.pjax = function( options ) {
     error: function(data){
       this.success(data.responseText);
       $container.trigger('error.pjax');
+      $container.trigger('end.pjax');
     },
     complete: function(jqXHR){
       $container.trigger('complete.pjax', jqXHR);
@@ -228,6 +229,7 @@ $.pjax = function( options ) {
       // Invoke their success handler if they gave us one.
       success.apply(this, arguments);
       $container.trigger('success.pjax');
+      $container.trigger('end.pjax');
     }
   }
 
