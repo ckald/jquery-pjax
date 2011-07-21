@@ -182,7 +182,8 @@ $.pjax = function( options ) {
 
          var state = {
            pjax: options.container,
-           timeout: options.timeout
+           timeout: options.timeout,
+           clickedElement: options.clickedElement, 
          };
 
       if( $.support.pjax )
@@ -326,7 +327,8 @@ $(window).bind('popstate', function(event){
         url: state.url || location.href,
         container: container,
         push: false,
-        timeout: state.timeout
+        timeout: state.timeout,
+        clickedElement: state.clickedElement,
       });
     else
       window.location = location.href;
