@@ -320,7 +320,7 @@ $(window).bind('popstate', function(event){
   var state = event.state;
 
   if ( state && state.pjax ) {
-    var container = state.pjax;  
+    var container = state.pjax;
     if ( $(container+'').length )
       $.pjax({
         url: state.url || location.href,
@@ -337,5 +337,21 @@ $(window).bind('popstate', function(event){
 // $(window).bind('popstate')
 if ( $.inArray('state', $.event.props) < 0 )
   $.event.props.push('state');
+
+
+// Is pjax supported by this browser?
+$.support.pjax =
+  window.history && window.history.pushState && window.history.replaceState
+  // pushState isn't reliable on iOS yet.
+  && !navigator.userAgent.match(/(iPod|iPhone|iPad|WebApps\/.+CFNetwork)/)
+
+
+// Fall back to normalcy for older browsers.
+if ( !$.support.pjax ) {
+  $.pjax = function( options ) {
+    window.location = $.isFunction(options.url) ? options.url() : options.url
+  }
+  $.fn.pjax = function() { return this }
+}
 
 })(jQuery);
