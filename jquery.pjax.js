@@ -50,7 +50,7 @@ $.fn.pjax = function( container, options ) {
 
   // We can't persist $objects using the history API so we must use
   // a String selector. Bail if we got anything else.
-  if ( options.container && typeof options.container !== 'string' ) {
+  if ( typeof options.container !== 'string' ) {
     throw "pjax container must be a string selector!";
     return false;
   }
@@ -65,8 +65,7 @@ $.fn.pjax = function( container, options ) {
       url: this.href,
       container: $(this).attr('data-pjax'),
       clickedElement: $(this),
-      isform: false,
-      fragment: null
+      isform: false
     }
 
     $.pjax($.extend({}, defaults, options));
@@ -166,20 +165,10 @@ $.pjax = function( options ) {
     success: function(data){
       // If we got no data or an entire web page, go directly
       // to the page and let normal error handling happen.
-      if ( options.fragment ) {
-        // If they specified a fragment, look for it in the response
-        // and pull it out.
-        var $fragment = $(data).find(options.fragment)
-        if ( $fragment.length )
-          data = $fragment.children()
-        else
-          return window.location = options.url
-      }
-      else {
-         if ( !$.trim(data) || /<html/i.test(data) )
-         {
-            return window.location = options.url;
-         }
+
+      if ( !$.trim(data) || /<html/i.test(data) )
+      {
+         return window.location = options.url;
       }
 
       // Make it happen.
@@ -193,7 +182,6 @@ $.pjax = function( options ) {
 
          var state = {
            pjax: options.container,
-           fragment: options.fragment,
            timeout: options.timeout
          };
 
