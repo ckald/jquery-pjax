@@ -45,7 +45,7 @@ $.container = '#pjaxcontainer';
 
 `$.hash` is a string, which appeares is url, when browser doesn't support pushState. So, by default, url of page changes from http://yoursite.com/this/is/awesome/article to http://yoursite.com/#!/this/is/awesome/article and pjax sends request to server with first url. 
 
-Links are interchangable – so if someone with modern browser gets old-style link `http://yoursite.com/#!/page` – he would be redirected to 'http://yoursite.com/page' and vice versa.
+Links are interchangable – so if someone with modern browser gets old-style link http://yoursite.com/#!/page – he would be redirected to http://yoursite.com/page and vice versa.
 
 ## And what about SEO?
 
