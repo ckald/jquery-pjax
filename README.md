@@ -28,7 +28,7 @@ I hope, you'll enjoy mix of pushState and regular #!/hash navigation.
 
 Some features and changes:
 
-*    IE 7,8 support (maybe some others)
+*    IE7+, FF4+ and all modern browsers (if it works on some not mentioned ancient browser – please let me know `ckaldeg@gmail.com`)
 *    mix of html5-like navigation and old-school #!/hashes
 *    i added most of ';' in lines of code for you :]. for some reason, defunkt didn't use them, but it was strange for me
 *    links from both kinds of browsers are interchangable
@@ -38,9 +38,26 @@ Some bad news:
 *    you HAVE to put some settings before using: 
 
 ```js
-$.siteurl = 'http://yousite.com';
+$.hash = '#!/';
+$.siteurl = 'http://yoursite.com';
 $.container = '#pjaxcontainer';
 ```
+
+`$.hash` is a string, which appeares is url, when browser doesn't support pushState. So, by default, url of page changes from `http://yoursite.com/this/is/awesome/article` to `http://yoursite.com/#!/this/is/awesome/article` and pjax sends request to server with first url. 
+
+Links are interchangable – so if someone with modern browser gets old-style link `http://yoursite.com/#!/page` – he would be redirected to 'http://yoursite.com/page' and vice versa.
+
+## And what about SEO?
+
+All we know, most part of AJAX-enabled sites have issues with search engine crawlers – their links are basically not parsable because of `#`. But we can handle it at least with Google!
+
+Default $.hash value is meaningful and hopely would be parsed in future by all major search engine crawlers. All you need – set up some custom routing on your server: if crawler meets link like `http://yoursite.com/#!/some/path/on/site`, he sends request to `http://yoursite.com/?_escaped_fragment_=/some/path/on/site` and parses it.
+
+For more information: 
+
+*   http://googlewebmastercentral.blogspot.com/2009/10/proposal-for-making-ajax-crawlable.html
+*   http://code.google.com/intl/ru-RU/web/ajaxcrawling/docs/specification.html
+
 
 ## What was it?
 
