@@ -43,7 +43,7 @@ $.siteurl = 'http://yoursite.com';
 $.container = '#pjaxcontainer';
 ```
 
-`$.hash` is a string, which appeares is url, when browser doesn't support pushState. So, by default, url of page changes from `http://yoursite.com/this/is/awesome/article` to `http://yoursite.com/#!/this/is/awesome/article` and pjax sends request to server with first url. 
+`$.hash` is a string, which appeares is url, when browser doesn't support pushState. So, by default, url of page changes from http://yoursite.com/this/is/awesome/article to http://yoursite.com/#!/this/is/awesome/article and pjax sends request to server with first url. 
 
 Links are interchangable – so if someone with modern browser gets old-style link `http://yoursite.com/#!/page` – he would be redirected to 'http://yoursite.com/page' and vice versa.
 
@@ -51,7 +51,7 @@ Links are interchangable – so if someone with modern browser gets old-style li
 
 All we know, most part of AJAX-enabled sites have issues with search engine crawlers – their links are basically not parsable because of `#`. But we can handle it at least with Google!
 
-Default $.hash value is meaningful and hopely would be parsed in future by all major search engine crawlers. All you need – set up some custom routing on your server: if crawler meets link like `http://yoursite.com/#!/some/path/on/site`, he sends request to `http://yoursite.com/?_escaped_fragment_=/some/path/on/site` and parses it.
+Default `$.hash` value is meaningful and hopely would be parsed in future by all major search engine crawlers. All you need – set up some custom routing on your server: if crawler meets link like http://yoursite.com/#!/some/path/on/site, he sends request to http://yoursite.com/?_escaped_fragment_=/some/path/on/site and parses it.
 
 For more information: 
 
