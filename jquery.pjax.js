@@ -112,8 +112,14 @@
 
 (function($){
   if (!$.hash) $.hash = '#!/';
-  if (!$.siteurl) $.siteurl = 'http://yoursite.com'; // your site url
-  if (!$.container) $.container = '#pjaxcontainer'; // container SELECTOR to use for hash navigation
+  if (!$.siteurl) $.siteurl = document.location.protocol+'//'+document.location.host; // your site url
+  if (!$.container) $.container = '#content'; // container SELECTOR to use for hash navigation
+
+  // Is pjax supported by this browser?
+  $.support.pjax =
+  window.history && window.history.pushState && window.history.replaceState
+  // pushState isn't reliable on iOS yet.
+  && !navigator.userAgent.match(/(iPod|iPhone|iPad|WebApps\/.+CFNetwork)/);
 
   // When called on a link, fetches the href with ajax into the
   // container specified as the first parameter or with the data-pjax
@@ -188,7 +194,12 @@
 
     return this.live('submit', function(event){
       $(options.container).trigger('form-submit.pjax', $(this));
-      data = $(this).serialize();
+      if (typeof options.serialize !=='undefined') {
+        var data = options.serialize(this);
+      }
+      else {
+        var data = $(this).serialize();
+      }
       options.type = $(this).attr('method');
 
       var defaults = {
@@ -324,6 +335,21 @@
       this.trigger('success.pjax', [data, textStatus, jqXHR]);
     }
 
+    options.beforeSend = function(jqXHR, settings){
+      jqXHR.setRequestHeader('X-PJAX', 'true');
+      jqXHR.setRequestHeader('X-PJAX-SUPPORT', $.support.pjax?true:false);
+      jqXHR.setRequestHeader('X-Referer', ($.support.pjax)?window.location.href:window.location.href.replace('/#!', ''));
+      this.trigger('start.pjax', [jqXHR, settings]);
+    }
+    options.error = function(jqXHR, textStatus, errorThrown){
+      this.trigger('error.pjax', [jqXHR, textStatus, errorThrown]);
+      if ( textStatus !== 'abort' )
+        window.location = options.url;
+    }
+    options.complete = function(jqXHR, textStatus){
+      this.trigger('complete.pjax', [jqXHR, textStatus]);
+    }
+
     // Cancel the current request if we're already pjaxing
     var xhr = pjax.xhr;
     if ( xhr && xhr.readyState < 4) {
@@ -342,26 +368,17 @@
     timeout: 650,
     push: true,
     replace: false,
+    url: $.support.pjax ? window.location.href : window.location.hash.substr(2),
     // We want the browser to maintain two separate internal caches: one for
     // pjax'd partial page loads and one for normal page loads. Without
     // adding this secret parameter, some browsers will often confuse the two.
     data: {
       _pjax: true
     },
+    cache:false,
     type: 'GET',
     dataType: 'html',
-    siteurl : $.siteurl,
-    beforeSend: function(jqXHR, settings){
-      jqXHR.setRequestHeader('X-PJAX', 'true');
-      jqXHR.setRequestHeader('X-Referer', ($.support.pjax)?window.location.href:window.location.href.replace('/#!', ''));
-      this.trigger('start.pjax', [jqXHR, settings])
-    },
-    error: function(jqXHR, textStatus, errorThrown){
-      this.trigger('error.pjax', [jqXHR, textStatus, errorThrown]);
-    },
-    complete: function(jqXHR, textStatus){
-      this.trigger('complete.pjax', [jqXHR, textStatus]);
-    }
+    siteurl : $.siteurl
   }
 
 
@@ -402,12 +419,6 @@
     $.event.props.push('state');
 
 
-  // Is pjax supported by this browser?
-  $.support.pjax =
-  window.history && window.history.pushState && window.history.replaceState
-  // pushState isn't reliable on iOS yet.
-  && !navigator.userAgent.match(/(iPod|iPhone|iPad|WebApps\/.+CFNetwork)/);
-
   // While page is loading, we should handle different URL types
   var hash = window.location.hash.toString();
 
@@ -432,9 +443,11 @@
       if ( (hash.substr(0,2) == '#!' || hash=='') && hash != $.hash) {
         $.ajax({
           type: "GET",
+          cache:false,
           url: $.siteurl+hash.replace('#!',''),
           beforeSend : function(jqXHR, settings) {
             jqXHR.setRequestHeader('X-PJAX','true');
+            jqXHR.setRequestHeader('X-PJAX-SUPPORT', $.support.pjax?true:false);
             jqXHR.setRequestHeader('X-Referer', $.hash.replace('#!',''));
             $($.container).trigger('start.pjax', [jqXHR, settings]);
           },
