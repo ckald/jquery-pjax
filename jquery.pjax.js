@@ -424,7 +424,7 @@
 
   if( hash.length > 0 )
   {
-    if( $.support.pjax )
+    if( $.support.pjax && hash.match(/^#!\/.*/))
       location = $.siteurl+hash.substr(2);
 
   }
