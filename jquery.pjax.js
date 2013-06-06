@@ -239,7 +239,8 @@
   // Returns whatever $.ajax returns.
   var pjax = $.pjax = function( options ) {
     var $container = $(options.container),
-    success = options.success || $.noop;
+    success = options.success || $.noop,
+  $settings = [];
 
     // We don't want to let anyone override our success handler.
     delete options.success;
@@ -332,22 +333,23 @@
 
       // Invoke their success handler if they gave us one.
       success.apply(this, arguments);
-      this.trigger('success.pjax', [data, textStatus, jqXHR]);
+      this.trigger('success.pjax', [data, textStatus, jqXHR, $settings]);
     }
 
     options.beforeSend = function(jqXHR, settings){
       jqXHR.setRequestHeader('X-PJAX', 'true');
       jqXHR.setRequestHeader('X-PJAX-SUPPORT', $.support.pjax?true:false);
       jqXHR.setRequestHeader('X-Referer', ($.support.pjax)?window.location.href:window.location.href.replace('/#!', ''));
-      this.trigger('start.pjax', [jqXHR, settings]);
+	  $settings = settings;
+      this.trigger('start.pjax', [jqXHR, $settings]);
     }
     options.error = function(jqXHR, textStatus, errorThrown){
-      this.trigger('error.pjax', [jqXHR, textStatus, errorThrown]);
+      this.trigger('error.pjax', [jqXHR, textStatus, errorThrown, $settings]);
       if ( textStatus !== 'abort' )
         window.location = options.url;
     }
     options.complete = function(jqXHR, textStatus){
-      this.trigger('complete.pjax', [jqXHR, textStatus]);
+      this.trigger('complete.pjax', [jqXHR, textStatus, $settings]);
     }
 
     // Cancel the current request if we're already pjaxing
@@ -449,17 +451,18 @@
             jqXHR.setRequestHeader('X-PJAX','true');
             jqXHR.setRequestHeader('X-PJAX-SUPPORT', $.support.pjax?true:false);
             jqXHR.setRequestHeader('X-Referer', $.hash.replace('#!',''));
-            $($.container).trigger('start.pjax', [jqXHR, settings]);
+			$settings = settings;
+            $($.container).trigger('start.pjax', [jqXHR, $settings]);
           },
           success: function(data, textStatus, jqXHR){
             $($.container).html(data);
-            $($.container).trigger('success.pjax', [data, textStatus, jqXHR]);
+            $($.container).trigger('success.pjax', [data, textStatus, jqXHR, $settings]);
           },
           complete: function(jqXHR, textStatus){
-            $($.container).trigger('complete.pjax', [jqXHR, textStatus]);
+            $($.container).trigger('complete.pjax', [jqXHR, textStatus, $settings]);
           },
           error: function(jqXHR, textStatus, errorThrown) {
-            $($.container).trigger('error.pjax', [jqXHR, textStatus, errorThrown]);
+            $($.container).trigger('error.pjax', [jqXHR, textStatus, errorThrown, $settings]);
           }
         });
 
